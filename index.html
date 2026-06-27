@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetAura — Find People Who Match Your Vibe</title>
+<meta name="description" content="MeetAura is an AI-powered social discovery app that helps you find nearby people who share your interests, hobbies and vibe.">
+<style>
+  :root {
+    --purple: #6c47ff;
+    --purple-light: #a78bfa;
+    --gold: #f59e0b;
+    --bg: #0a0a0a;
+    --card: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #ffffff;
+    --text-dim: #888888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .glow-bg {
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(108,71,255,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .glow-bg2 {
+    position: fixed;
+    bottom: -200px;
+    left: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--purple);
+    box-shadow: 0 0 12px var(--purple);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+  }
+
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--purple-light); }
+
+  main { position: relative; z-index: 1; }
+
+  .hero {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 100px 24px 60px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(108,71,255,0.12);
+    border: 1px solid rgba(108,71,255,0.4);
+    color: var(--purple-light);
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+
+  h1 span {
+    color: var(--purple-light);
+    background: linear-gradient(135deg, #a78bfa, #6c47ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto 36px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--purple);
+    color: #fff;
+    padding: 16px 32px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(108,71,255,0.4);
+    transition: transform 0.2s;
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); }
+
+  .btn-secondary {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 16px 32px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    transition: border-color 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--purple); }
+
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 16px;
+    margin-bottom: 56px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 28px;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--purple);
+  }
+
+  .feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(108,71,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 18px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .stats-strip {
+    background: linear-gradient(135deg, rgba(108,71,255,0.1), rgba(245,158,11,0.06));
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 24px;
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--purple-light);
+  }
+
+  .stat-label {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .how-it-works {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+  }
+
+  .step-card {
+    text-align: center;
+    padding: 24px;
+  }
+
+  .step-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--purple);
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    box-shadow: 0 0 20px rgba(108,71,255,0.5);
+  }
+
+  .step-card h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .step-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .cta-final {
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 70px 32px;
+    margin: 80px auto;
+    max-width: 1100px;
+  }
+
+  .cta-final h2 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .cta-final p {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    font-size: 16px;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 24px 32px;
+    text-align: center;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  .footer-links a:hover { color: var(--purple-light); }
+
+  .footer-copy {
+    color: #555;
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 36px; }
+    .hero p { font-size: 16px; }
+    .nav-links { display: none; }
+    .section { padding: 56px 20px; }
+    .stats-strip { gap: 32px; padding: 32px 20px; }
+    .stat-num { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-bg"></div>
+<div class="glow-bg2"></div>
+
+<nav>
+  <div class="logo"><span class="logo-dot"></span> MeetAura</div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How It Works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="support.html">Support</a>
+  </div>
+</nav>
+
+<main>
+
+  <section class="hero">
+    <div class="badge">✨ AI-Powered Social Discovery</div>
+    <h1>Find People Who<br><span>Match Your Vibe</span></h1>
+    <p>MeetAura uses advanced AI to connect you with nearby people who share your interests, hobbies, and energy — not just your location.</p>
+    <div class="cta-row">
+      <a href="#" class="btn-primary">📲 Get it on Google Play</a>
+      <a href="#features" class="btn-secondary">Explore Features</a>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="section-title">Everything You Need to Connect</div>
+    <div class="section-sub">A complete social discovery experience, built for real connections</div>
+    <div class="grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>AI Vibe Matching</h3>
+        <p>Our AI analyzes interests, hobbies, skills, and personal notes to find people who truly match your energy — not just keywords.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h3>Auto Detection</h3>
+        <p>Get notified the instant someone with your vibe enters your radius — even when the app is closed.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🗺️</div>
+        <h3>Nearby & Universal Map</h3>
+        <p>See real people around you on a live map, or switch to Universal Mode to discover connections worldwide.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Real-Time Chat & Groups</h3>
+        <p>Message one-on-one or create groups with multiple people who share your interests — all in real time.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3>Offline Meetings</h3>
+        <p>Take it beyond the screen — send and manage real-life meetup requests with people you've connected with.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Draw Your Own Avatar</h3>
+        <p>Sketch a unique profile picture directly with your finger using our built-in drawing canvas — no two avatars alike.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="stats-strip">
+      <div>
+        <div class="stat-num">AI</div>
+        <div class="stat-label">Powered Matching</div>
+      </div>
+      <div>
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Background Detection</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Privacy Controlled</div>
+      </div>
+      <div>
+        <div class="stat-num">Free</div>
+        <div class="stat-label">To Get Started</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="section-title">How It Works</div>
+    <div class="section-sub">Get started in under a minute</div>
+    <div class="how-it-works">
+
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h4>Create Your Profile</h4>
+        <p>Share your interests, hobbies, and what makes you, you.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h4>Let AI Find Matches</h4>
+        <p>Our AI scans nearby profiles to find your strongest vibe matches.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h4>Connect & Chat</h4>
+        <p>Send a request, start chatting, or join group conversations.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h4>Meet in Real Life</h4>
+        <p>When you're ready, turn your online connection into a real one.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="cta-final">
+    <h2>Ready to find your vibe?</h2>
+    <p>Download MeetAura and start discovering people who actually get you.</p>
+    <a href="#" class="btn-primary">📲 Download on Google Play</a>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="support.html">Support</a>
+    <a href="csae.html">Child Safety Standards</a>
+    <a href="mailto:meetaura2026@gmail.com">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 MeetAura. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
